@@ -5,29 +5,27 @@ import (
 	"log"
 	"regexp"
 	"strings"
-
-	"gopkg.in/fatih/set.v0"
 )
 
 var punctuationRegex = regexp.MustCompile(`[^\p{Ll}\p{Lu}\p{Lt}\p{Lo}\p{Nd}\p{Pc}\s]`)
 
 // StopWords implements a simple language detector
 type StopWords struct {
-	cachedStopWords map[string]*set.Set
+	cachedStopWords map[string]map[string]struct{}
 }
 
 // NewStopwords returns an instance of a stop words detector
 func NewStopwords() StopWords {
-	cachedStopWords := make(map[string]*set.Set)
+	cachedStopWords := make(map[string]map[string]struct{})
 	for lang, stopwords := range sw {
 		lines := strings.Split(stopwords, "\n")
-		cachedStopWords[lang] = set.New()
+		cachedStopWords[lang] = make(map[string]struct{})
 		for _, line := range lines {
 			if strings.HasPrefix(line, "#") {
 				continue
 			}
 			line = strings.TrimSpace(line)
-			cachedStopWords[lang].Add(line)
+			cachedStopWords[lang][line] = struct{}{}
 		}
 	}
 	return StopWords{
@@ -71,19 +69,19 @@ func (stop *StopWords) stopWordsCount(lang string, items []string) wordStats {
 		return wordStats{}
 	}
 	ws := wordStats{}
-	stopWords := set.New()
+	stopWords := make(map[string]struct{})
 	stops := stop.cachedStopWords[lang]
 	count := 0
 	if stops != nil {
 		for _, item := range items {
-			if stops.Has(item) {
-				stopWords.Add(item)
+			if _, ok := stops[item]; ok {
+				stopWords[item] = struct{}{}
 				count++
 			}
 		}
 	}
 
-	ws.stopWordCount = stopWords.Size()
+	ws.stopWordCount = len(stopWords)
 	ws.wordCount = len(items)
 	ws.stopWords = stopWords
 
