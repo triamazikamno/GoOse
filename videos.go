@@ -1,10 +1,11 @@
 package goose
 
 import (
-	"github.com/PuerkitoBio/goquery"
-	"gopkg.in/fatih/set.v0"
 	"strconv"
 	"strings"
+
+	"github.com/PuerkitoBio/goquery"
+	"gopkg.in/fatih/set.v0"
 )
 
 // VideoExtractor can extract the main video from an HTML page
@@ -78,7 +79,7 @@ func (ve *VideoExtractor) getProvider(src string) string {
 
 func (ve *VideoExtractor) getVideo(node *goquery.Selection) video {
 	src := ve.getSrc(node)
-	video := video{
+	return video{
 		embedCode: ve.getEmbedCode(node),
 		embedType: node.Get(0).DataAtom.String(),
 		width:     ve.getWidth(node),
@@ -86,7 +87,6 @@ func (ve *VideoExtractor) getVideo(node *goquery.Selection) video {
 		src:       src,
 		provider:  ve.getProvider(src),
 	}
-	return video
 }
 
 func (ve *VideoExtractor) getIFrame(node *goquery.Selection) video {
@@ -123,10 +123,10 @@ func (ve *VideoExtractor) getObjectTag(node *goquery.Selection) video {
 	if provider == "" {
 		return video{}
 	}
-	video := ve.getVideo(node)
-	video.provider = provider
-	video.src = src
-	return video
+	videoObj := ve.getVideo(node)
+	videoObj.provider = provider
+	videoObj.src = src
+	return videoObj
 }
 
 // GetVideos returns the video tags embedded in the article

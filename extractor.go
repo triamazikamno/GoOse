@@ -288,8 +288,7 @@ func (extr *ContentExtractor) CalculateBestNode(document *goquery.Document) *goq
 	parentNodes := set.New()
 	nodesWithText := list.New()
 	for _, node := range nodesToCheck {
-		textNode := node.Text()
-		ws := extr.config.stopWords.stopWordsCount(extr.config.targetLanguage, textNode)
+		ws := extr.config.stopWords.stopWordsCount(extr.config.targetLanguage, strings.Split(strings.ToLower(node.Text()), " "))
 		highLinkDensity := extr.isHighLinkDensity(node)
 		if ws.stopWordCount > 2 && !highLinkDensity {
 			nodesWithText.PushBack(node)
@@ -327,8 +326,7 @@ func (extr *ContentExtractor) CalculateBestNode(document *goquery.Document) *goq
 		if extr.config.debug {
 			log.Printf("Location Boost Score %1.5f on iteration %d id='%s' class='%s'\n", boostScore, i, extr.config.parser.name("id", node), extr.config.parser.name("class", node))
 		}
-		textNode := node.Text()
-		ws := extr.config.stopWords.stopWordsCount(extr.config.targetLanguage, textNode)
+		ws := extr.config.stopWords.stopWordsCount(extr.config.targetLanguage, strings.Split(strings.ToLower(node.Text()), " "))
 		upScore := ws.stopWordCount + int(boostScore)
 		parentNode := node.Parent()
 		extr.updateScore(parentNode, upScore)
@@ -431,8 +429,7 @@ func (extr *ContentExtractor) isBoostable(node *goquery.Selection) bool {
 				return false
 			}
 
-			paraText := node.Text()
-			ws := extr.config.stopWords.stopWordsCount(extr.config.targetLanguage, paraText)
+			ws := extr.config.stopWords.stopWordsCount(extr.config.targetLanguage, strings.Split(strings.ToLower(node.Text()), " "))
 			if ws.stopWordCount > 5 {
 				if extr.config.debug {
 					log.Println("We're gonna boost this node, seems content")
@@ -538,8 +535,7 @@ func (extr *ContentExtractor) getSiblingsScore(topNode *goquery.Selection) int {
 	paragraphScore := 0
 	nodesToCheck := topNode.Find("p")
 	nodesToCheck.Each(func(i int, s *goquery.Selection) {
-		textNode := s.Text()
-		ws := extr.config.stopWords.stopWordsCount(extr.config.targetLanguage, textNode)
+		ws := extr.config.stopWords.stopWordsCount(extr.config.targetLanguage, strings.Split(strings.ToLower(s.Text()), " "))
 		highLinkDensity := extr.isHighLinkDensity(s)
 		if ws.stopWordCount > 2 && !highLinkDensity {
 			paragraphNumber++
@@ -563,7 +559,7 @@ func (extr *ContentExtractor) getSiblingsContent(currentSibling *goquery.Selecti
 	potentialParagraphs.Each(func(i int, s *goquery.Selection) {
 		text := s.Text()
 		if len(text) > 0 {
-			ws := extr.config.stopWords.stopWordsCount(extr.config.targetLanguage, text)
+			ws := extr.config.stopWords.stopWordsCount(extr.config.targetLanguage, strings.Split(strings.ToLower(text), " "))
 			paragraphScore := ws.stopWordCount
 			siblingBaselineScore := 0.30
 			highLinkDensity := extr.isHighLinkDensity(s)

@@ -1,11 +1,12 @@
 package goose
 
 import (
-	"github.com/PuerkitoBio/goquery"
 	"net/url"
 	"regexp"
 	"strconv"
 	"strings"
+
+	"github.com/PuerkitoBio/goquery"
 )
 
 type candidate struct {
@@ -248,13 +249,13 @@ func OpenGraphResolver(doc *goquery.Document) string {
 			attr, exist := tag.Attr(ogTag.attribute)
 			value, vexist := tag.Attr(ogTag.value)
 			if exist && attr == ogTag.name && vexist {
-				ogImage := ogImage{
+				ogImageObj := ogImage{
 					url:   value,
 					tpe:   ogTag.tpe,
 					score: 0,
 				}
 
-				ogImages = append(ogImages, ogImage)
+				ogImages = append(ogImages, ogImageObj)
 			}
 		}
 	})

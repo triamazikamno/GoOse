@@ -66,14 +66,12 @@ func (stop *StopWords) removePunctuation(text string) string {
 	return punctuationRegex.ReplaceAllString(text, "")
 }
 
-func (stop *StopWords) stopWordsCount(lang string, text string) wordStats {
-	if text == "" {
+func (stop *StopWords) stopWordsCount(lang string, items []string) wordStats {
+	if len(items) == 0 {
 		return wordStats{}
 	}
 	ws := wordStats{}
 	stopWords := set.New()
-	text = strings.ToLower(text)
-	items := strings.Split(text, " ")
 	stops := stop.cachedStopWords[lang]
 	count := 0
 	if stops != nil {
@@ -96,9 +94,9 @@ func (stop *StopWords) stopWordsCount(lang string, text string) wordStats {
 func (stop StopWords) SimpleLanguageDetector(text string) string {
 	max := 0
 	currentLang := "en"
-
+	items := strings.Split(strings.ToLower(text), " ")
 	for k := range sw {
-		ws := stop.stopWordsCount(k, text)
+		ws := stop.stopWordsCount(k, items)
 		if ws.stopWordCount > max {
 			max = ws.stopWordCount
 			currentLang = k
