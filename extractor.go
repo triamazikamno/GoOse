@@ -288,7 +288,11 @@ func (extr *ContentExtractor) CalculateBestNode(document *goquery.Document) *goq
 	parentNodes := set.New(set.ThreadSafe)
 	nodesWithText := list.New()
 	for _, node := range nodesToCheck {
-		ws := extr.config.stopWords.stopWordsCount(extr.config.targetLanguage, strings.Split(strings.ToLower(node.Text()), " "))
+		space := " "
+		if extr.config.targetLanguage == "ja" || extr.config.targetLanguage == "zh" {
+			space = ""
+		}
+		ws := extr.config.stopWords.stopWordsCount(extr.config.targetLanguage, strings.Split(strings.ToLower(node.Text()), space))
 		highLinkDensity := extr.isHighLinkDensity(node)
 		if ws.stopWordCount > 2 && !highLinkDensity {
 			nodesWithText.PushBack(node)
@@ -448,7 +452,7 @@ func (extr *ContentExtractor) isBoostable(node *goquery.Selection) bool {
 //returns a list of nodes we want to search on like paragraphs and tables
 func (extr *ContentExtractor) nodesToCheck(doc *goquery.Document) []*goquery.Selection {
 	var output []*goquery.Selection
-	tags := []string{"p", "pre", "td"}
+	tags := []string{"p", "pre", "td", "article", "div"}
 	for _, tag := range tags {
 		selections := doc.Children().Find(tag)
 		if selections != nil {
