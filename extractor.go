@@ -423,7 +423,8 @@ func (extr *ContentExtractor) updateNodeCount(node *goquery.Selection, addToCoun
 func (extr *ContentExtractor) isBoostable(node *goquery.Selection) bool {
 	stepsAway := 0
 	next := node.Next()
-	for next != nil && stepsAway < node.Siblings().Length() {
+	l := node.Siblings().Length()
+	for next != nil && stepsAway < l {
 		currentNodeTag := node.Get(0).DataAtom.String()
 		if currentNodeTag == "p" {
 			if stepsAway >= 3 {
