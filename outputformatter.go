@@ -171,7 +171,7 @@ func (formatter *outputFormatter) removeParagraphsWithFewWords() {
 	}
 	allNodes := formatter.topNode.Children()
 	allNodes.Each(func(i int, s *goquery.Selection) {
-		sw := formatter.config.stopWords.stopWordsCount(language, strings.Split(strings.ToLower(s.Text()), " "))
+		sw := formatter.config.stopWords.stopWordsCount(&formatter.config, language, s.Text(), nil)
 		if sw.wordCount < 5 && s.Find("object").Length() == 0 && s.Find("em").Length() == 0 {
 			node := s.Get(0)
 			node.Parent.RemoveChild(node)

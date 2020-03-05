@@ -1,6 +1,7 @@
 package goose
 
 import (
+	"strings"
 	"time"
 )
 
@@ -66,4 +67,32 @@ func GetDefaultConfiguration(args ...string) Configuration {
 		parser:                  NewParser(),
 		timeout:                 time.Duration(5 * time.Second),
 	}
+}
+
+var (
+	jaSeparators = []rune{'。', '！', '？', '\n', '、', ' '}
+)
+
+func split(s string, separators []rune) []string {
+	f := func(r rune) bool {
+		for _, s := range separators {
+			if r == s {
+				return true
+			}
+		}
+		return false
+	}
+	return strings.FieldsFunc(s, f)
+}
+
+func (c Configuration) Words(str string) []string {
+	switch c.targetLanguage {
+	case "ja":
+		words := split(str, jaSeparators)
+		for i := range words {
+			words[i] = strings.TrimSpace(words[i])
+		}
+		return split(str, jaSeparators)
+	}
+	return strings.Split(strings.ToLower(str), " ")
 }
