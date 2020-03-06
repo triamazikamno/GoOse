@@ -38,7 +38,6 @@ func replaceTagWithContents(tagSelection *goquery.Selection, collapsibleAtomType
 	if node.FirstChild == nil {
 		node.Attr = []html.Attribute{}
 		node.DataAtom = 0
-		node.Data = ""
 		node.FirstChild = nil
 		node.LastChild = nil
 	} else {
@@ -69,7 +68,6 @@ func collapseTextNodes(node *html.Node, collapsibleAtomTypes []atom.Atom) {
 		// this tag only contains a single textual node, already contained in the parent
 		node.Attr = []html.Attribute{}
 		node.Type = html.TextNode
-		node.Data = ""
 		node.DataAtom = 0
 		node.FirstChild = nil
 		node.LastChild = nil
