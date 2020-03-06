@@ -88,8 +88,11 @@ func (stop *StopWords) stopWordsCount(config *Configuration, lang string, text s
 				if sw == "" {
 					continue
 				}
-				stopWords[sw] = struct{}{}
-				count += strings.Count(text, sw)
+				cnt := strings.Count(text, sw)
+				if cnt > 0 {
+					stopWords[sw] = struct{}{}
+					count += cnt
+				}
 			}
 		default:
 			for _, item := range items {

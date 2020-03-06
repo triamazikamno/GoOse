@@ -311,7 +311,6 @@ func (extr *ContentExtractor) CalculateBestNode(document *goquery.Document) *goq
 				startingBoost++
 			}
 		}
-
 		if nodesNumber > 15 {
 			if float64(nodesNumber-i) <= bottomNegativeScoring {
 				booster := bottomNegativeScoring - float64(nodesNumber-i)
@@ -468,27 +467,23 @@ func (extr *ContentExtractor) isHighLinkDensity(node *goquery.Selection) bool {
 		return false
 	}
 	text := node.Text()
-
-	words := extr.config.Words(text)
-	nwords := len(words)
-	var sb []string
-	links.Each(func(i int, s *goquery.Selection) {
-		linkText := s.Text()
-		sb = append(sb, linkText)
-	})
-	linkText := strings.Join(sb, "")
-	linkWords := extr.config.Words(linkText)
-	nlinkWords := len(linkWords)
+	if text == "" {
+		return false
+	}
+	nWords := len(extr.config.Words(text))
+	if nWords == 0 {
+		return false
+	}
 	nlinks := links.Size()
-	linkDivisor := float64(nlinkWords) / float64(nwords)
+	linkDivisor := 2 / float64(nWords)
 	score := linkDivisor * float64(nlinks)
 
 	if extr.config.debug {
 		var logText string
-		if len(node.Text()) >= 51 {
-			logText = node.Text()[0:50]
+		if len(text) >= 51 {
+			logText = text[0:50]
 		} else {
-			logText = node.Text()
+			logText = text
 		}
 		log.Printf("Calculated link density score as %1.5f for node %s\n", score, logText)
 	}
@@ -640,17 +635,6 @@ func (extr *ContentExtractor) PostCleanup(targetNode *goquery.Selection) *goquer
 				}
 			})
 
-			subParagraph2 := s.Find("p")
-			if subParagraph2.Length() == 0 && tag != "td" {
-				if extr.config.debug {
-					log.Println("Removing node because it doesn't have any paragraphs")
-				}
-				extr.config.parser.removeNode(s)
-			} else {
-				if extr.config.debug {
-					log.Println("Not removing TD node")
-				}
-			}
 			return
 		}
 	})
